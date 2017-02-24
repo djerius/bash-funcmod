@@ -78,7 +78,7 @@ _FUNCMOD_install_proxy() {
 
     eval "$cntr=0"
     _FUNCMOD_copy_func $funcname _FUNCMOD_around_${normname}
-    eval "$funcname() { _FUNCMOD_proxy $funcname \"$@\" ; }"
+    eval "$funcname() { _FUNCMOD_proxy $funcname "'"$@" ; }'
 }
 
 before() {
@@ -137,7 +137,7 @@ around() {
 	local orig=$(_FUNCMOD_func_name $funcname)
 	_FUNCMOD_copy_func  _FUNCMOD_around_${normname} "$orig"
 
-	eval "_FUNCMOD_around_${normname} () { $modifier $orig \"$@\" ; }"
+	eval "_FUNCMOD_around_${normname} () { $modifier $orig "'"$@" ; }'
     done
 
 }
