@@ -1,0 +1,101 @@
+=head1 NAME
+
+funcmod - CLOS like modifiers for bash functions
+
+=head1 SYNOPSIS
+
+ source funcmod.sh
+
+ func () { echo "func" ; }
+
+ bfunc () { echo "before" ; }
+
+ afunc () { echo "after" ; }
+
+ rfunc () {
+   local orig=$1
+   shift
+
+   echo "before orig"
+
+   # invoke original function and save return value
+   local rval=0
+   $orig "$@" || rval=$?
+
+   echo "after orig"
+
+   # return original return value
+   builtin return $rval
+ }
+
+
+ before func bfunc
+ after func afunc
+ around func rfunc
+
+ func
+
+Results in
+
+ before
+ before orig
+ func
+ after orig
+ after
+
+=head1 DESCRIPTION
+
+B<funcmod> provides
+L<CLOS|https://en.wikipedia.org/wiki/Common_Lisp_Object_System>-like
+modifiers for bash functions.  It wraps the original function and
+calls the user specified functions at the specified entry points when
+the original function is invoked.
+
+A function may be modified more than once (and by the same modifier).
+
+=head1 FUNCTIONS
+
+=head2 before
+
+  before func1 [func2 ... ]   modifier
+
+The function C<modifier> is called before the function it is
+modifiying.  Its return value is totally ignored.  It receives the
+same arguments as the function it is modifying.  The modifier
+B<cannot> change the arguments passed to the original function.
+
+=head2 after
+
+  after func1 [func2 ... ]   modifier
+
+The function C<modifier> is called after the function it is
+modifiying.  Its return value is totally ignored.  It receives the
+B<original> arguments passed to the function it is modifying.
+
+=head2 around
+
+  around func1 [func2 ... ]   modifier
+
+C<modifier> is called instead of the function it is modifying.  The
+name of the function that it is modifying is passed as the first
+argument (this will be a mangled name).
+
+This modifier may be used to alter the arguments passed to the function.
+
+Be careful to pass on the return value of the original function if
+required (see the L</SYNOPSIS> for one approach).
+
+
+=head1 AUTHOR
+
+Diab Jerius <djerius@cfa.harvard.edu>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+
