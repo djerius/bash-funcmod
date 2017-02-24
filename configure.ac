@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ([2.57])
 
-AC_INIT([funcmod],[0.01],[opticsoft@head.cfa.harvard.edu],[funcmod])
+AC_INIT([funcmod],[0.03],[opticsoft@head.cfa.harvard.edu],[funcmod])
 AC_CONFIG_SRCDIR([src/funcmod.sh])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_AUX_DIR([build-aux])

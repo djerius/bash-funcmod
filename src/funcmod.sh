@@ -2,6 +2,7 @@
 
 # CLOS like modifiers for bash functions.
 
+_FUNCMOD_VERSION () { echo .03 ; }
 
 _FUNCMOD_proxy () {
 
