@@ -12,9 +12,9 @@ cmp () { [[ $1 == $2 ]] || {
         }
 }
 
-add0 () { buffer+=0; return 22; }
-add1 () { buffer+=1; return 0; }
-add2 () { buffer+=2; return 0; }
+add-0 () { buffer+=0; return 22; }
+add-1 () { buffer+=1; return 0; }
+add-2 () { buffer+=2; return 0; }
 
 around1 () {
     local orig=$1
@@ -41,10 +41,10 @@ around2 () {
 
    buffer=
 
-   after add0 add1
-   after add0 add2
+   after add-0 add-1
+   after add-0 add-2
 
-   add0 && error "incorrect return value"
+   add-0 && error "incorrect return value"
    cmp $? 22 "incorrect return value"
 
    cmp $buffer 012
@@ -54,10 +54,10 @@ around2 () {
 
    buffer=
 
-   before add0 add1
-   before add0 add2
+   before add-0 add-1
+   before add-0 add-2
 
-   add0 && error "incorrect return value"
+   add-0 && error "incorrect return value"
    cmp $? 22 "incorrect return value"
 
    cmp $buffer 210
@@ -67,11 +67,11 @@ around2 () {
 
    buffer=
 
-   around add0 around1
+   around add-0 around1
 
-   around add0 around2
+   around add-0 around2
 
-   add0 && error "incorrect return value"
+   add-0 && error "incorrect return value"
    cmp $? 22 "incorrect return value"
 
    cmp $buffer 53046
@@ -81,13 +81,13 @@ around2 () {
 
    buffer=
 
-   after add0 add1
-   after add0 add2
+   after add-0 add-1
+   after add-0 add-2
 
-   before add0 add1
-   before add0 add2
+   before add-0 add-1
+   before add-0 add-2
 
-   add0 && error "incorrect return value"
+   add-0 && error "incorrect return value"
    cmp $? 22 "incorrect return value"
 
    cmp $buffer 21012
@@ -99,14 +99,14 @@ around2 () {
 
    buffer=
 
-   before add0 add1
-   before add0 add2
+   before add-0 add-1
+   before add-0 add-2
 
-   around add0 around1
+   around add-0 around1
 
-   around add0 around2
+   around add-0 around2
 
-   add0 && error "incorrect return value"
+   add-0 && error "incorrect return value"
    cmp $? 22 "incorrect return value"
 
    cmp $buffer 2153046
@@ -116,14 +116,14 @@ around2 () {
 
    buffer=
 
-   after add0 add1
-   after add0 add2
+   after add-0 add-1
+   after add-0 add-2
 
-   around add0 around1
+   around add-0 around1
 
-   around add0 around2
+   around add-0 around2
 
-   add0 && error "incorrect return value"
+   add-0 && error "incorrect return value"
    cmp $? 22 "incorrect return value"
 
    cmp $buffer 5304612
@@ -133,18 +133,18 @@ around2 () {
 
    buffer=
 
-   before add0 add1
-   before add0 add2
+   before add-0 add-1
+   before add-0 add-2
 
-   around add0 around1
+   around add-0 around1
 
-   around add0 around2
+   around add-0 around2
 
 
-   after add0 add1
-   after add0 add2
+   after add-0 add-1
+   after add-0 add-2
 
-   add0 && error "incorrect return value"
+   add-0 && error "incorrect return value"
    cmp $? 22 "incorrect return value"
 
    cmp $buffer 215304612

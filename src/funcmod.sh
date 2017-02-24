@@ -8,28 +8,29 @@ _FUNCMOD_proxy () {
     local funcname=$1
     local list
     local var
+    local normname=$(_FUNCMOD_normalize $funcname)
     shift
 
-    var="_FUNCMOD_before_${funcname}"
+    var=_FUNCMOD_before_${normname}
 
     if [[ ${!var:+set} == set ]]
     then
 
-	eval 'list=( ${'"$var"'[@]} )'
+	eval "list=( \${${var}[@]} )"
 	for func in "${list[@]}"; do
 	    eval $func "$@"
 	done
     fi
 
     local rval=0
-    eval "_FUNCMOD_around_${funcname} $@" || rval=$?
+    _FUNCMOD_around_${normname} $@ || rval=$?
 
-    var="_FUNCMOD_after_${funcname}"
+    var=_FUNCMOD_after_${normname}
 
     if [[ ${!var:+set} == set ]]
     then
 
-	eval 'list=( ${'"$var"'[@]} )'
+	eval "list=( \${${var}[@]} )"
 	for func in "${list[@]}" ; do
 	    eval $func "$@"
 	done
@@ -49,27 +50,34 @@ _FUNCMOD_copy_func () {
     eval "$definition"
 }
 
-_FUNCMOD_func_name() {
+_FUNCMOD_normalize () {
 
     local funcname=$1
-    local cntr=_FUNCMOD_cnt_${funcname}
+    echo ${funcname//-/_0x2D_}
+}
+
+_FUNCMOD_func_name() {
+
+    local normame=$1
+    local cntr=_FUNCMOD_cnt_${normname}
 
     local n=${!cntr}
 
-    echo _FUNCMOD_${n}_${funcname}
+    echo _FUNCMOD_${n}_${normname}
 }
 
 
 _FUNCMOD_install_proxy() {
 
-    local funcname=$1
-    local cntr=_FUNCMOD_cnt_${funcname}
+    local funcname=$1 normname=$2
+
+    local cntr=_FUNCMOD_cnt_${normname}
 
     [[ ${!cntr:-} != '' ]] && return
 
     eval "$cntr=0"
-    _FUNCMOD_copy_func $funcname _FUNCMOD_around_${funcname}
-    eval $funcname'() { _FUNCMOD_proxy '"$funcname"' "$@" ; }'
+    _FUNCMOD_copy_func $funcname _FUNCMOD_around_${normname}
+    eval "$funcname() { _FUNCMOD_proxy $funcname \"$@\" ; }"
 }
 
 before() {
@@ -83,8 +91,9 @@ before() {
     local funcname
 
     for funcname in ${args[*]} ; do
-	_FUNCMOD_install_proxy $funcname
-	list=_FUNCMOD_before_${funcname}
+	normname=$(_FUNCMOD_normalize $funcname)
+	_FUNCMOD_install_proxy $funcname $normname
+	list=_FUNCMOD_before_${normname}
 	eval "$list=( $modifier \${${list}[@]} )"
     done
 }
@@ -97,11 +106,12 @@ after() {
     unset args[$last]
 
     local list
-    local funcname
+    local funcname normname
 
     for funcname in ${args[*]} ; do
-	_FUNCMOD_install_proxy $funcname
-	list=_FUNCMOD_after_${funcname}
+	normname=$(_FUNCMOD_normalize $funcname)
+	_FUNCMOD_install_proxy $funcname $normname
+	list=_FUNCMOD_after_${normname}
 	eval "$list+=( $modifier )"
     done
 }
@@ -116,16 +126,17 @@ around() {
     unset args[$last]
 
     local list
-    local funcname
+    local funcname normname
 
     for funcname in ${args[*]} ; do
-	_FUNCMOD_install_proxy $funcname
-	local cntr=_FUNCMOD_cnt_${funcname}
+	normname=$(_FUNCMOD_normalize $funcname)
+	_FUNCMOD_install_proxy $funcname $normname
+	local cntr=_FUNCMOD_cnt_${normname}
 	builtin let  ++$cntr
 	local orig=$(_FUNCMOD_func_name $funcname)
-	_FUNCMOD_copy_func  _FUNCMOD_around_${funcname} "$orig"
+	_FUNCMOD_copy_func  _FUNCMOD_around_${normname} "$orig"
 
-	eval "_FUNCMOD_around_${funcname}"'() { '"$modifier"' '"$orig"' "$@" ; }'
+	eval "_FUNCMOD_around_${normname} () { $modifier $orig \"$@\" ; }"
     done
 
 }
